@@ -2,6 +2,7 @@
 import os
 import datetime
 import pandas as pd
+from collections import Counter
 from airflow import DAG
 from airflow.decorators import dag, task
 from airflow.sensors.filesystem import FileSensor
@@ -42,4 +43,12 @@ def parse_records(df) -> list:
       if record == flavor:
         valid_votes.append(record)
   return valid_votes
+
+@task
+def count_votes(valid_votes):
+  votes_dict = Counter(valid_votes)
+  max_value = max(votes_dict.values())
+  max_key = max(votes_dict, key=votes_dict.get)
+  print(f"{max_key} - {max_value}")
+
 
