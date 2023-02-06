@@ -1,0 +1,7 @@
+data/
+plugins/
+logs/
+
+venv/
+
+docker-compose.yaml
