@@ -10,8 +10,11 @@ from airflow.hooks.filesystem import FSHook
 # Global variable for votes file
 VOTES_FILE = "votes.csv"
 
+# list of flavors
+flavor_choices = ["lemon", "vanilla", "chocolate", "pistachio", "strawberry", "confetti", "caramel", "pumpkin", "rose"]
+
 @task
-def read_file():
+def read_file() -> None:
   """
   Read the votes CSV file
   """
@@ -26,6 +29,17 @@ def read_file():
 
   # Use pandas to read to CSV
   df = pd.read_csv(file_path, header=1)
+  return df
 
+@task
+def parse_records(df) -> list:
+  """
+  This function will go through each value of the votes file, see if it is within the flavor_choices list, and if so, it will append it to a new valid_votes list and return it
+  """
+  valid_votes = []
+  for record in df['votes']:
+    for flavor in flavor_choices:
+      if record == flavor:
+        valid_votes.append(record)
+  return valid_votes
 
-flavor_choices = ["lemon", "vanilla", "chocolate", "pistachio", "strawberry", "confetti", "caramel", "pumpkin", "rose"]
