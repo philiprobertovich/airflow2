@@ -2,7 +2,7 @@
 
 ### By Philip Kendall
 
-#### This project sets up a basic pipline in Airflow that accomplishes simple tasks.
+#### This project sets up a number of tasks using Airflow while utilizing key Airflow concepts such as Decorators, Xcoms, and Sensors.
 ## Technologies Used
 
 * GIT
@@ -12,7 +12,7 @@
 
 
 ## Description
-
+The pipeline created for this project first uses a sensor task to check for a votes.csv file. After it is found, the next task is to read the file and turn it into a dataframe. The next task takes the dataframe and iterates through each record to see if the value of that record matches one with a list called flavor_choices. If there is a match, that value is appended to a new list called valid_votes, which is then what the task returns. The following task recieves the information of that returned list via Airflow's Xcoms and then counts the values and returns that value with the highest amount of votes.
 
 
 ## Setup/Installation Requirements
@@ -40,7 +40,19 @@
   ```
 * Create directories for logs and plugins:
   ```
-  mkdir ./logs ./plugins
+  mkdir ./logs ./plugins ./data
+  ```
+* Modify the docker-compose.yaml file under the volumes section so that it includes a mounted conneciton to the data/ folder. It should resemble what's bellow:
+  ```
+  volumes:
+    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/data:/data
+  ```
+* To get the votes.csv files, execute the following command:
+  ```
+  gsutil -m cp gs://data.datastack.acadaemy/airflow_cr_2/votes.csv ./data
   ```
 * Initialize Airflow with the docker compose up command:
   ```
@@ -51,8 +63,9 @@
   docker-compose up
   ```
 * Navigate to localhost:8080/home in your browser and enter the Airflow credentials. Both username and password should be "airflow".
-* Find "code_review" under the DAG column and unpause the DAG.
-* After that, the DAG should run. Click on "code_review" to see the different views of the DAG's execution.
+* A connection to the sensor must be established, and can be done so through the GUI. Navigate to Admins > Connections and create a new conneciton. 
+* Find "airflow2_code_review" under the DAG column and unpause the DAG.
+* After that, the DAG should run. Click on "airflow2_code_review" to see the different views of the DAG's execution.
 
 ## Known Bugs
 
