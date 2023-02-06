@@ -63,7 +63,7 @@ The pipeline created for this project first uses a sensor task to check for a vo
   docker-compose up
   ```
 * Navigate to localhost:8080/home in your browser and enter the Airflow credentials. Both username and password should be "airflow".
-* A connection to the sensor must be established, and can be done so through the GUI. Navigate to Admins > Connections and create a new conneciton. 
+* A connection to the sensor must be established, and can be done so through the GUI. Navigate to Admins > Connections and create a new conneciton. Call it "data_fs", select "File (path)" as the connection type, and add "{"path": "data/"}" within the Extra section. 
 * Find "airflow2_code_review" under the DAG column and unpause the DAG.
 * After that, the DAG should run. Click on "airflow2_code_review" to see the different views of the DAG's execution.
 
