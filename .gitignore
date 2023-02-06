@@ -5,3 +5,5 @@ logs/
 venv/
 
 docker-compose.yaml
+
+.env
