@@ -1,6 +1,6 @@
 # Import necessary libraries
 import os
-import datetime
+from datetime import datetime
 import pandas as pd
 from collections import Counter
 from airflow import DAG
@@ -45,10 +45,31 @@ def parse_records(df) -> list:
   return valid_votes
 
 @task
-def count_votes(valid_votes):
+def count_votes(valid_votes) -> None:
   votes_dict = Counter(valid_votes)
   max_value = max(votes_dict.values())
   max_key = max(votes_dict, key=votes_dict.get)
   print(f"{max_key} - {max_value}")
 
+@dag(
+  schedule_interval="@once",
+  start_date=datetime.utcnow(),
+  catchup=False,
+  default_view='graph',
+  is_paused_upon_creation=True,
+  tags="code review"
+)
+def read_and_count_votes():
+  """
+  Putting all the task together to read the votes CSV and count the votes
+  """ 
 
+  # Waits for votes file to be the data_fs filesystem connection
+  wait_for_file = FileSensor(
+    task_id="wait_for_file",
+    poke_interval=15,
+    timeout=(30 * 60),
+    mode="poke",
+    filepath=VOTES_FILE,
+    fs_conn_id="data_fs"
+  )
