@@ -59,7 +59,7 @@ def count_votes(valid_votes) -> None:
   is_paused_upon_creation=True,
   tags="code review"
 )
-def read_and_count_votes():
+def read_file_count_votes():
   """
   Putting all the task together to read the votes CSV and count the votes
   """ 
@@ -73,3 +73,15 @@ def read_and_count_votes():
     filepath=VOTES_FILE,
     fs_conn_id="data_fs"
   )
+
+  read_file_task = read_file()
+
+  parse_recs_task = parse_records(read_file_task)
+
+  count_votes_task = count_votes(parse_recs_task)
+
+  # Task order 
+  wait_for_file >> read_file_task >> parse_recs_task >> count_votes_task
+
+# create dag
+dag =  read_file_count_votes
