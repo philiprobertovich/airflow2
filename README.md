@@ -14,6 +14,9 @@
 ## Description
 The pipeline created for this project first uses a sensor task to check for a votes.csv file. After it is found, the next task is to read the file and turn it into a dataframe. The next task takes the dataframe and iterates through each record to see if the value of that record matches one with a list called flavor_choices. If there is a match, that value is appended to a new list called valid_votes, which is then what the task returns. The following task recieves the information of that returned list via Airflow's Xcoms and then counts the values and returns that value with the highest amount of votes.
 
+Below is a graphical representation of the DAG made in draw.io:
+
+<img src="img/airflow2_dag_model.jpg" alt="Picture of the DAG.">
 
 ## Setup/Installation Requirements
 
