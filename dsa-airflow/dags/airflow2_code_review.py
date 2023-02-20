@@ -3,10 +3,19 @@ import os
 from datetime import datetime
 import pandas as pd
 from collections import Counter
-from airflow import DAG
+# from airflow import DAG
 from airflow.decorators import dag, task
 from airflow.sensors.filesystem import FileSensor
 from airflow.hooks.filesystem import FSHook
+
+# # get the data_fs filesystem root path
+# data_fs = FSHook(conn_id='data_fs')
+# # get the airflow connection for data_fs
+# data_dir = data_fs.get_path()
+# # print(f"data_fs root path: {data_dir}")
+
+# # create the full path to votes file
+# VOTES_FILE = os.path.join(data_dir, 'votes.csv')
 
 # Global variable for votes file
 VOTES_FILE = "votes.csv"
@@ -15,7 +24,7 @@ VOTES_FILE = "votes.csv"
 flavor_choices = ["lemon", "vanilla", "chocolate", "pistachio", "strawberry", "confetti", "caramel", "pumpkin", "rose"]
 
 @task
-def read_file() -> None:
+def read_file():
   """
   Read the votes CSV file
   """
@@ -25,7 +34,7 @@ def read_file() -> None:
   data_dir = data_fs.get_path()
   print(f"data_fs root path: {data_dir}")
 
-  # create the full path to votes file
+  # # create the full path to votes file
   file_path = os.path.join(data_dir, VOTES_FILE)
 
   # Use pandas to read to CSV
@@ -33,7 +42,7 @@ def read_file() -> None:
   return df
 
 @task
-def parse_records(df) -> list:
+def parse_records(df):
   """
   This function will go through each value of the votes file, see if it is within the flavor_choices list, and if so, it will append it to a new valid_votes list and return it
   """
@@ -45,7 +54,7 @@ def parse_records(df) -> list:
   return valid_votes
 
 @task
-def count_votes(valid_votes) -> None:
+def count_votes(valid_votes):
   votes_dict = Counter(valid_votes)
   max_value = max(votes_dict.values())
   max_key = max(votes_dict, key=votes_dict.get)
@@ -56,8 +65,7 @@ def count_votes(valid_votes) -> None:
   start_date=datetime.utcnow(),
   catchup=False,
   default_view='graph',
-  is_paused_upon_creation=True,
-  tags="code review"
+  is_paused_upon_creation=True
 )
 def read_file_count_votes():
   """
@@ -74,6 +82,7 @@ def read_file_count_votes():
     fs_conn_id="data_fs"
   )
 
+  # Set tasks
   read_file_task = read_file()
 
   parse_recs_task = parse_records(read_file_task)
@@ -84,4 +93,4 @@ def read_file_count_votes():
   wait_for_file >> read_file_task >> parse_recs_task >> count_votes_task
 
 # create dag
-dag =  read_file_count_votes
+dag =  read_file_count_votes()
